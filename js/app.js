@@ -114,9 +114,9 @@ function handleUserClick(event) {
         let list = document.getElementById('results-list');
 
         let btn = document.getElementById('View Results');
-        btn.addEventListener('click', heba)
+        btn.addEventListener('click', creatResults)
 
-        function heba(event) {
+        function creatResults(event) {
 
             console.log(event.target.id);
             for (let i = 0; i < Product.allProducts.length; i++) {
