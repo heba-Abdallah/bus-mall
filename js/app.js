@@ -6,9 +6,15 @@ let photoElement = document.getElementById('photos-div');
 let maxAttempts = 25;
 let counter = 0;
 
+let photoArr = [];
+
 let leftPhotoIndex;
-let middelPhotoIndex;
+let middlePhotoIndex;
 let rightPhotoIndex;
+
+let namesArr = [];
+let votesArr = [];
+let timesItShownArr = [];
 
 function Product(name, path) {
     this.name = name;
@@ -16,6 +22,7 @@ function Product(name, path) {
     this.votes = 0;
     this.timesItShown = 0;
     Product.allProducts.push(this)
+    namesArr.push(this.name)
 
 }
 
@@ -42,45 +49,59 @@ new Product('usb', 'img/usb.gif');
 new Product('water-can', 'img/water-can.jpg');
 new Product('wine-glass', 'img/wine-glass.jpg');
 
-console.log(Product.allProducts);
+// console.log(Product.allProducts);
 
 function generateRandomIndex() {
     return Math.floor(Math.random() * Product.allProducts.length);
 
 }
-console.log(generateRandomIndex());
+// console.log(generateRandomIndex());
+
+
 
 function renderThreePhotos() {
     leftPhotoIndex = generateRandomIndex();
-    middelPhotoIndex = generateRandomIndex();
+    middlePhotoIndex = generateRandomIndex();
     rightPhotoIndex = generateRandomIndex();
 
-    while ((leftPhotoIndex === middelPhotoIndex) || (middelPhotoIndex === rightPhotoIndex) || (leftPhotoIndex === rightPhotoIndex)) {
+    while (photoArr.includes(leftPhotoIndex) || leftPhotoIndex === middlePhotoIndex || photoArr.includes(middlePhotoIndex) || middlePhotoIndex === rightPhotoIndex || photoArr.includes(rightPhotoIndex) || leftPhotoIndex === rightPhotoIndex) {
         leftPhotoIndex = generateRandomIndex();
-        middelPhotoIndex = generateRandomIndex();
+        middlePhotoIndex = generateRandomIndex();
         rightPhotoIndex = generateRandomIndex();
 
-
     }
-    console.log('left', Product.allProducts[leftPhotoIndex].source);
-    console.log('middel', Product.allProducts[middelPhotoIndex].source);
-    console.log('right', Product.allProducts[rightPhotoIndex].source);
+    // console.log('left', Product.allProducts[leftPhotoIndex].source);
+    // console.log('middel', Product.allProducts[middlePhotoIndex].source);
+    // console.log('right', Product.allProducts[rightPhotoIndex].source);
+
+
+
+
 
     let leftElement = document.getElementById('left-photo');
     leftElement.src = Product.allProducts[leftPhotoIndex].source;
     photoElement.appendChild(leftElement);
-    let middelElement = document.getElementById('middel-photo');
-    photoElement.appendChild(middelElement);
-    middelElement.src = Product.allProducts[middelPhotoIndex].source;
+    Product.allProducts[leftPhotoIndex].timesItShown++;
+
+    let middleElement = document.getElementById('middle-photo');
+    photoElement.appendChild(middleElement);
+    middleElement.src = Product.allProducts[middlePhotoIndex].source;
+    Product.allProducts[middlePhotoIndex].timesItShown++;
+
     let rightElement = document.getElementById('right-photo');
     photoElement.appendChild(rightElement);
     rightElement.src = Product.allProducts[rightPhotoIndex].source;
+    Product.allProducts[rightPhotoIndex].timesItShown++;
+    photoArr = [];
+    photoArr.push(leftPhotoIndex, middlePhotoIndex, rightPhotoIndex);
+
+    console.log('allPhoto', photoArr);
 }
 renderThreePhotos();
 
-Product.allProducts[leftPhotoIndex].timesItShown++;
-Product.allProducts[middelPhotoIndex].timesItShown++;
-Product.allProducts[rightPhotoIndex].timesItShown++;
+
+
+
 
 
 photoElement.addEventListener('click', handleUserClick);
@@ -88,7 +109,7 @@ photoElement.addEventListener('click', handleUserClick);
 function handleUserClick(event) {
 
     counter++;
-    console.log(event.target.id);
+    // console.log("hello", event.target.id);
 
     if (counter <= maxAttempts) {
 
@@ -96,17 +117,19 @@ function handleUserClick(event) {
             Product.allProducts[leftPhotoIndex].votes++;
 
 
-        } else if (event.target.id === 'middel-photo') {
-            Product.allProducts[middelPhotoIndex].votes++;
+        } else if (event.target.id === 'middle-photo') {
+            Product.allProducts[middlePhotoIndex].votes++;
 
-        } else {
+        } else if (event.target.id === 'right-photo') {
             Product.allProducts[rightPhotoIndex].votes++;
 
+        } else {
+            counter--;
         }
 
         renderThreePhotos();
 
-        console.log(counter);
+        // console.log(counter);
 
     } else {
         photoElement.removeEventListener('click', handleUserClick);
@@ -114,12 +137,22 @@ function handleUserClick(event) {
         let list = document.getElementById('results-list');
 
         let btn = document.getElementById('View Results');
-        btn.hidden=false;
+        btn.hidden = false;
+        for (let i = 0; i < Product.allProducts.length; i++) {
+            votesArr.push(Product.allProducts[i].votes);
+            timesItShownArr.push(Product.allProducts[i].timesItShown);
+
+        }
+        // console.log(votesArr);
+        // console.log(timesItShownArr);
+
+        chart();
+
         btn.addEventListener('click', creatResults)
 
         function creatResults(event) {
 
-            console.log(event.target.id);
+            // console.log("hi",event.target.id);
             for (let i = 0; i < Product.allProducts.length; i++) {
 
                 let productsResults = document.createElement('li');
@@ -137,4 +170,44 @@ function handleUserClick(event) {
 
     }
 }
-// let productsResults;
+
+// chart.js
+function chart() {
+    let ctx = document.getElementById('myChart').getContext('2d');
+
+    let chart = new Chart(ctx, {
+        // what type is the chart
+        type: 'bar',
+
+        //  the data for showing
+        data: {
+            //  for the names
+            labels: namesArr,
+
+            datasets: [
+                {
+                    label: 'User votes',
+                    data: votesArr,
+                    backgroundColor: [
+                        '#ead3cb',
+                    ],
+
+                    borderWidth: 1
+                },
+
+                {
+                    label: 'Products shown',
+                    data: timesItShownArr,
+                    backgroundColor: [
+                        '#845460',
+                    ],
+
+                    borderWidth: 1
+                }
+
+            ]
+        },
+        options: {}
+    });
+
+}
