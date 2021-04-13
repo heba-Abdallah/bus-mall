@@ -114,6 +114,7 @@ function handleUserClick(event) {
         let list = document.getElementById('results-list');
 
         let btn = document.getElementById('View Results');
+        btn.hidden=false;
         btn.addEventListener('click', creatResults)
 
         function creatResults(event) {
@@ -127,6 +128,8 @@ function handleUserClick(event) {
 
                 productsResults.textContent = `${Product.allProducts[i].name} has ${Product.allProducts[i].votes} votes,and was seen ${Product.allProducts[i].timesItShown} times`
             }
+            btn.removeEventListener('click', creatResults)
+
         }
 
 
