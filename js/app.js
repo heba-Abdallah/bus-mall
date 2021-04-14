@@ -16,7 +16,7 @@ let namesArr = [];
 let votesArr = [];
 let timesItShownArr = [];
 
-function Product(name, path) {
+function Product(name, path,votes,timesItShown) {
     this.name = name;
     this.source = path;
     this.votes = 0;
@@ -51,6 +51,30 @@ new Product('wine-glass', 'img/wine-glass.jpg');
 
 // console.log(Product.allProducts);
 
+
+function mallStorage() {
+    let arrayString = JSON.stringify(Product.allProducts);
+
+    console.log('hi', Product.allProducts);
+    console.log('hello', arrayString);
+
+
+    localStorage.setItem('user', arrayString);
+
+}
+
+function mallOrder() {
+    let data = localStorage.getItem('user');
+    console.log('data', data);
+    let mallData = JSON.parse(data);
+    console.log('mall', mallData);
+
+    if (mallData !== null) {
+        Product.allProducts = mallData;
+    }
+    renderThreePhotos();
+}
+
 function generateRandomIndex() {
     return Math.floor(Math.random() * Product.allProducts.length);
 
@@ -64,7 +88,7 @@ function renderThreePhotos() {
     middlePhotoIndex = generateRandomIndex();
     rightPhotoIndex = generateRandomIndex();
 
-    while (photoArr.includes(leftPhotoIndex) || leftPhotoIndex === middlePhotoIndex || photoArr.includes(middlePhotoIndex) || middlePhotoIndex === rightPhotoIndex || photoArr.includes(rightPhotoIndex) || leftPhotoIndex === rightPhotoIndex) {
+    while (leftPhotoIndex === middlePhotoIndex || middlePhotoIndex === rightPhotoIndex || leftPhotoIndex === rightPhotoIndex || photoArr.includes(leftPhotoIndex) || photoArr.includes(middlePhotoIndex) || photoArr.includes(rightPhotoIndex)) {
         leftPhotoIndex = generateRandomIndex();
         middlePhotoIndex = generateRandomIndex();
         rightPhotoIndex = generateRandomIndex();
@@ -96,6 +120,8 @@ function renderThreePhotos() {
     photoArr.push(leftPhotoIndex, middlePhotoIndex, rightPhotoIndex);
 
     console.log('allPhoto', photoArr);
+
+    
 }
 renderThreePhotos();
 
@@ -136,7 +162,7 @@ function handleUserClick(event) {
 
         let list = document.getElementById('results-list');
 
-        let btn = document.getElementById('View Results');
+        let btn = document.getElementById('View-Results');
         btn.hidden = false;
         for (let i = 0; i < Product.allProducts.length; i++) {
             votesArr.push(Product.allProducts[i].votes);
@@ -169,6 +195,7 @@ function handleUserClick(event) {
 
 
     }
+    mallStorage();
 }
 
 // chart.js
@@ -211,3 +238,4 @@ function chart() {
     });
 
 }
+mallOrder();
